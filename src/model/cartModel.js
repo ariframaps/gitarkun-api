@@ -20,6 +20,7 @@ const cartSchema = new mongoose.Schema({
   ],
   total: {
     type: Number,
+    default: 0,
     required: [true, "Total amount is required"],
     min: [0, "Total amount must be a positive number"],
   },
