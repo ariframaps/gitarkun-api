@@ -105,5 +105,4 @@ const addOrder = async (req, res) => {
 module.exports = {
   getOrders,
   addOrder,
-  getPurchasedProducts,
 };
