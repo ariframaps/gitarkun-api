@@ -1,5 +1,4 @@
 const { Analytics } = require("../model/analyticsModel");
-const { Product } = require("../model/productModel");
 
 // Controller to get analytics data for a seller
 const getAnalytics = async (req, res) => {
@@ -23,5 +22,4 @@ const getAnalytics = async (req, res) => {
 
 module.exports = {
   getAnalytics,
-  getAnalyticsProduct,
 };

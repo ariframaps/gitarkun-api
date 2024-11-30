@@ -1,3 +1,5 @@
+const mongoose = require("mongoose");
+
 // Order Schema
 const orderSchema = new mongoose.Schema({
   buyerId: {

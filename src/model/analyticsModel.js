@@ -1,3 +1,5 @@
+const mongoose = require("mongoose");
+
 // Analytics Schema (Optional for seller dashboard)
 const analyticsSchema = new mongoose.Schema({
   sellerId: {

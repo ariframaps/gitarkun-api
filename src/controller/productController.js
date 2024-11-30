@@ -1,4 +1,4 @@
-const { Product } = require("../schema/productSchema");
+const { Product } = require("../model/productModel");
 
 // Get the latest 9 products
 const getLatestProducts = async (req, res) => {
@@ -23,9 +23,7 @@ const getLatestProducts = async (req, res) => {
 const getAllProducts = async (req, res) => {
   try {
     const { filter = {}, sort = {} } = req.query;
-    const products = await Product.find(JSON.parse(filter)).sort(
-      JSON.parse(sort)
-    ); // Filter and sorting as needed
+    const products = await Product.find(filter).sort(sort); // Filter and sorting as needed
     if (!products || products.length === 0) {
       return res.status(404).json({ message: "No products found" });
     }
@@ -33,7 +31,7 @@ const getAllProducts = async (req, res) => {
       .status(200)
       .json({ message: "All products fetched successfully", data: products });
   } catch (error) {
-    console.error("Error fetching all products:", error);
+    console.error("Error fetching all products:", error.message);
     return res.status(500).json({ message: "Error fetching all products" });
   }
 };
@@ -81,17 +79,38 @@ const getMyProducts = async (req, res) => {
 // Add a new product
 const addNewProduct = async (req, res) => {
   try {
-    const { name, description, price, stock, sellerId } = req.body;
+    const {
+      name,
+      description,
+      image,
+      price,
+      difficulty,
+      link,
+      category,
+      sellerId,
+    } = req.body;
 
-    if (!name || !description || !price || !stock || !sellerId) {
+    if (
+      !name ||
+      !description ||
+      !price ||
+      !image ||
+      !difficulty ||
+      !link ||
+      !category ||
+      !sellerId
+    ) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
     const newProduct = new Product({
       name,
       description,
+      image,
+      difficulty,
+      link,
+      category,
       price,
-      stock,
       sellerId,
     });
 
