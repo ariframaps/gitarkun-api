@@ -18,23 +18,6 @@ const getCart = async (req, res) => {
   }
 };
 
-/**
- * @route POST /cart
- * @desc Add a product to the cart
- * @access Public
- *
- * Request Body:
- * {
- *   userId: string,      // ID of the user
- *   productId: string,   // ID of the product to add
- *   quantity: number     // Quantity to add
- * }
- *
- * Response:
- * 201 - Product added to cart
- * 400 - Missing required fields
- * 500 - Error adding product to cart
- */
 const addCart = async (req, res) => {
   try {
     const { userId, productId, price } = req.body;
@@ -71,16 +54,6 @@ const addCart = async (req, res) => {
   }
 };
 
-/**
- * @route DELETE /cart/:userId/:productId
- * @desc Delete an item from the cart
- * @access Public
- *
- * Response:
- * 200 - Item removed from cart
- * 404 - Cart or product not found
- * 500 - Error deleting cart item
- */
 const deleteCartItem = async (req, res) => {
   try {
     const { userId, productId, price } = req.params;

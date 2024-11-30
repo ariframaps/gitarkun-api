@@ -1,10 +1,13 @@
 const { Analytics } = require("../model/analyticsModel");
+const { Product } = require("../model/productModel");
 
 // Controller to get analytics data for a seller
 const getAnalytics = async (req, res) => {
   try {
     const { sellerId } = req.params; // Extract sellerId from request parameters
-    const analytics = await Analytics.findOne({ sellerId });
+    const analytics = await Analytics.findOne({ sellerId }).populate(
+      "products.product"
+    );
 
     if (!analytics) {
       return res.status(404).json({ message: "Analytics data not found" });
@@ -18,16 +21,7 @@ const getAnalytics = async (req, res) => {
   }
 };
 
-/**
- * @route GET /analytics/:sellerId
- * @desc Get analytics data for a specific seller
- * @access Public
- *
- * Response:
- * 200 - Analytics data found
- * 404 - Analytics data not found
- * 500 - Error fetching analytics data
- */
 module.exports = {
   getAnalytics,
+  getAnalyticsProduct,
 };
