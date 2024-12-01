@@ -22,14 +22,26 @@ const getLatestProducts = async (req, res) => {
 // Get all products with filters and sorting
 const getAllProducts = async (req, res) => {
   try {
-    const { filter = {}, sort = {} } = req.query;
-    const products = await Product.find(filter).sort(sort); // Filter and sorting as needed
+    const { filter = {}, sort = {}, page = 1, limit = 9 } = req.query;
+    const skip = (page - 1) * limit; // Hitung offset berdasarkan page dan limit
+
+    const products = await Product.find(filter)
+      .sort(sort)
+      .skip(skip) // Skip produk berdasarkan offset
+      .limit(Number(limit)); // Batasi produk sesuai limit; // Filter and sorting as needed
+
+    // Ambil total jumlah produk untuk pagination
+    const totalItems = await Product.countDocuments(filter); // Total produk yang sesuai filter
+
     if (!products || products.length === 0) {
       return res.status(404).json({ message: "No products found" });
     }
-    return res
-      .status(200)
-      .json({ message: "All products fetched successfully", data: products });
+
+    return res.status(200).json({
+      message: "All products fetched successfully",
+      data: products,
+      totalItems,
+    });
   } catch (error) {
     console.error("Error fetching all products:", error.message);
     return res.status(500).json({ message: "Error fetching all products" });
@@ -37,9 +49,31 @@ const getAllProducts = async (req, res) => {
 };
 
 // Get a single product by its ID
-const getSingleProduct = async (req, res) => {
+const getSingleProductById = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.productId);
+    let product = await Product.findById(req.params.productId);
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    return res
+      .status(200)
+      .json({ message: "Product fetched successfully", data: product });
+  } catch (error) {
+    console.error("Error fetching product:", error);
+    if (error.kind === "ObjectId") {
+      return res.status(400).json({ message: "Invalid product ID" });
+    }
+    return res.status(500).json({ message: "Error fetching product" });
+  }
+};
+
+// Get a single product by its name
+const getSingleProductByName = async (req, res) => {
+  try {
+    const productName = req.params.productName.split("_").join(" ");
+    let product = await Product.findOne({ name: productName });
+
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
@@ -173,7 +207,8 @@ const deleteProduct = async (req, res) => {
 module.exports = {
   getLatestProducts,
   getAllProducts,
-  getSingleProduct,
+  getSingleProductById,
+  getSingleProductByName,
   getMyProducts,
   addNewProduct,
   editProduct,

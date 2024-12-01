@@ -2,7 +2,8 @@ const express = require("express");
 const {
   getLatestProducts,
   getAllProducts,
-  getSingleProduct,
+  getSingleProductByName,
+  getSingleProductById,
   getMyProducts,
   addNewProduct,
   editProduct,
@@ -25,7 +26,8 @@ router.get("/", (req, res) => {
 // public product
 router.get("/product", getAllProducts); // tested
 router.get("/product/latest", getLatestProducts); //tested
-router.get("/product/:productId", getSingleProduct); // tested
+router.get("/product/name/:productName", getSingleProductByName); // tested
+router.get("/product/id/:productId", getSingleProductById); // tested
 
 // private product
 router.get("/product/my/:sellerId", getMyProducts);
@@ -34,15 +36,15 @@ router.put("/product/my/:productId", editProduct);
 router.delete("/product/my/:productId", deleteProduct);
 
 // private order
-router.get("/order", getOrders);
-router.post("/order", addOrder);
+router.get("/order/:userId", getOrders);
+router.post("/order/:userId", addOrder);
 
 // private cart
-router.get("/cart", getCart);
+router.get("/cart/:userId", getCart);
 router.post("/cart", addCart);
 router.delete("/cart", deleteCartItem);
 
 // private analytics
-router.get("/analytics", getAnalytics);
+router.get("/analytics/:sellerId", getAnalytics);
 
 module.exports = router;

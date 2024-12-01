@@ -13,7 +13,9 @@ const getAnalytics = async (req, res) => {
     }
 
     // Respond with the found analytics data
-    return res.status(200).json({ analytics });
+    return res
+      .status(200)
+      .json({ message: "succeessfully fetch analytics", data: analytics });
   } catch (error) {
     console.error("Error fetching analytics:", error);
     return res.status(500).json({ message: "Error fetching analytics" });

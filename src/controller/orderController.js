@@ -6,7 +6,7 @@ const { Analytics } = require("../model/analyticsModel");
 // Controller to get the products a user has purchased
 const getOrders = async (req, res) => {
   try {
-    const userId = req.user.id; // Clerk user ID from authentication
+    const userId = req.params.userId; // Clerk user ID from authentication
     const orders = await Order.find({ buyerId: userId }).populate(
       "products.product"
     );
@@ -21,7 +21,9 @@ const getOrders = async (req, res) => {
       order.products.map((p) => p.product)
     );
 
-    res.status(200).json({ products });
+    res
+      .status(200)
+      .json({ message: "successfully getting orders", data: products });
   } catch (error) {
     console.error("Error fetching orders:", error);
     res.status(500).json({ message: "Error fetching orders" });
@@ -30,10 +32,13 @@ const getOrders = async (req, res) => {
 
 const addOrder = async (req, res) => {
   try {
-    const userId = req.user.id; // Clerk user ID
+    const userId = req.params.userId; // Clerk user ID
 
     // Find the user's cart
-    const cart = await Cart.findOne({ buyerId: userId });
+    const cart = await Cart.findOne({ userId }).populate({
+      path: "products.product",
+      select: "name image category link isDeleted",
+    });
 
     if (!cart) {
       return res.status(404).json({
@@ -51,23 +56,29 @@ const addOrder = async (req, res) => {
 
     // Update seller analytics for each product in the cart
     for (const item of cart.products) {
-      const product = await Product.findById(item.product);
+      const product = await Product.findById(item.product._id);
       if (!product) {
-        console.error(`Product with ID ${item.product} not found.`);
+        console.error(`Product with ID ${item.product._id} not found.`);
         continue;
       }
 
-      const sellerAnalytics = await Analytics.findOne({
+      let sellerAnalytics = await Analytics.findOne({
         sellerId: product.sellerId,
       });
       if (!sellerAnalytics) {
         console.error(`Analytics not found for seller ${product.sellerId}.`);
-        continue;
+        const newAnalytics = new Analytics({
+          sellerId: product.sellerId,
+          totalSales: 0,
+          totalRevenue: 0,
+          productStats: [],
+        });
+        sellerAnalytics = await newAnalytics.save();
       }
 
       // Find product stats in seller's analytics
       const productStat = sellerAnalytics.productStats.find(
-        (p) => p.product.toString() === item.product.toString()
+        (p) => p.product.toString() === item.product._id.toString()
       );
       if (productStat) {
         // Update existing stats
@@ -76,7 +87,7 @@ const addOrder = async (req, res) => {
       } else {
         // Add new product stats
         sellerAnalytics.productStats.push({
-          product: item.product,
+          product: item.product._id,
           salesCount: 1,
           revenue: item.price,
         });
@@ -91,11 +102,11 @@ const addOrder = async (req, res) => {
     }
 
     // Clear the user's cart after successful checkout
-    await Cart.deleteOne({ userId: userId });
+    await Cart.deleteOne({ userId });
 
     res
       .status(201)
-      .json({ message: "Order placed successfully", order: newOrder });
+      .json({ message: "Order placed successfully", data: newOrder });
   } catch (error) {
     console.error("Error placing order:", error);
     res.status(500).json({ message: "Error placing order" });

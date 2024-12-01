@@ -13,10 +13,20 @@ const cartSchema = new mongoose.Schema({
         ref: "Product",
         required: [true, "Product is required"],
       },
+      image: {
+        type: String,
+        required: [true, "Product image is required"],
+      },
       price: {
         type: Number,
         required: [true, "Product price is required"],
         min: [0, "Price must be a positive number"],
+      },
+      name: {
+        type: String,
+        required: [true, "Product name is required"],
+        trim: true,
+        unique: true,
       },
     },
   ],
@@ -49,3 +59,4 @@ cartSchema.post("save", function (error, doc, next) {
 });
 
 module.exports.Cart = mongoose.model("Cart", cartSchema);
+module.exports.CartSchema;
