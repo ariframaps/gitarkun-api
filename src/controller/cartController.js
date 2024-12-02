@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const getCart = async (req, res) => {
   try {
     const { userId } = req.params; // Extract userId from request parameters
+    console.log(userId);
     const cart = await Cart.findOne({ userId }).populate("products.product");
 
     if (!cart) {
@@ -12,7 +13,7 @@ const getCart = async (req, res) => {
     }
 
     // Respond with the found cart
-    return res.status(200).json({ message: "success", data: cart });
+    return res.status(200).json(cart);
   } catch (error) {
     console.error("Error fetching cart:", error);
     return res.status(500).json({ message: "Error fetching cart" });
@@ -22,6 +23,7 @@ const getCart = async (req, res) => {
 const addCart = async (req, res) => {
   try {
     const { userId, product } = req.body; // product: productId, image, price, name
+    console.log(userId, product);
 
     if (!userId || !product) {
       return res.status(400).json({ message: "Missing required fields" });
@@ -52,12 +54,10 @@ const addCart = async (req, res) => {
       cart.total += product.price;
     }
 
-    await cart.save();
+    await cart.save().then((res) => console.log(res));
 
     // Respond with the updated cart
-    return res
-      .status(201)
-      .json({ message: "Cart item added successfully", data: cart });
+    return res.status(201).json(cart);
   } catch (error) {
     console.error("Error adding product to cart:", error);
     return res.status(500).json({ message: "Error adding product to cart" });
@@ -66,7 +66,8 @@ const addCart = async (req, res) => {
 
 const deleteCartItem = async (req, res) => {
   try {
-    const { userId, productId, price } = req.params;
+    const { userId, productId, price } = req.query;
+    console.log(userId, productId, price, "ini delete bos");
 
     const cart = await Cart.findOne({ userId });
     if (!cart) {
@@ -76,14 +77,28 @@ const deleteCartItem = async (req, res) => {
     const itemIndex = cart.products.findIndex(
       (item) => item.product.toString() === productId
     );
+    console.log(itemIndex);
     if (itemIndex === -1) {
       return res.status(404).json({ message: "Product not found in cart" });
     }
 
+    const parsedPrice = Number(price);
+    if (isNaN(parsedPrice)) {
+      return res.status(400).json({ message: "Invalid price" });
+    }
+
+    if (cart.products.length === 1) {
+      await Cart.deleteOne({ userId }); // Menghapus seluruh cart
+      return res
+        .status(200)
+        .json({ message: "Cart is empty and has been deleted" });
+    }
+
     // Remove the item from the cart
     cart.products.splice(itemIndex, 1);
+    console.log(miaw);
     // reducing total amount
-    cart.total -= price;
+    cart.total -= Number(price);
 
     await cart.save();
 

@@ -15,7 +15,6 @@ const orderSchema = new mongoose.Schema({
             type: String,
             required: [true, "Product name is required"],
             trim: true,
-            unique: true,
           },
           image: {
             type: String,

@@ -7,10 +7,7 @@ const getLatestProducts = async (req, res) => {
     if (!products || products.length === 0) {
       return res.status(404).json({ message: "No products found" });
     }
-    return res.status(200).json({
-      message: "Latest products fetched successfully",
-      data: products,
-    });
+    return res.status(200).json(products);
   } catch (error) {
     console.error("Error fetching latest products:", error.message);
     return res.status(500).json({
@@ -22,26 +19,21 @@ const getLatestProducts = async (req, res) => {
 // Get all products with filters and sorting
 const getAllProducts = async (req, res) => {
   try {
-    const { filter = {}, sort = {}, page = 1, limit = 9 } = req.query;
+    const { page = 1, limit = 9 } = req.query;
     const skip = (page - 1) * limit; // Hitung offset berdasarkan page dan limit
 
-    const products = await Product.find(filter)
-      .sort(sort)
-      .skip(skip) // Skip produk berdasarkan offset
-      .limit(Number(limit)); // Batasi produk sesuai limit; // Filter and sorting as needed
+    const products = await Product.find();
+    // .skip(skip) // Skip produk berdasarkan offset
+    // .limit(Number(limit)); // Batasi produk sesuai limit; // Filter and sorting as needed
 
     // Ambil total jumlah produk untuk pagination
-    const totalItems = await Product.countDocuments(filter); // Total produk yang sesuai filter
+    // const totalItems = await Product.countDocuments(); // Total produk yang sesuai filter
 
     if (!products || products.length === 0) {
       return res.status(404).json({ message: "No products found" });
     }
 
-    return res.status(200).json({
-      message: "All products fetched successfully",
-      data: products,
-      totalItems,
-    });
+    return res.status(200).json(products);
   } catch (error) {
     console.error("Error fetching all products:", error.message);
     return res.status(500).json({ message: "Error fetching all products" });
@@ -56,9 +48,7 @@ const getSingleProductById = async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
-    return res
-      .status(200)
-      .json({ message: "Product fetched successfully", data: product });
+    return res.status(200).json(product);
   } catch (error) {
     console.error("Error fetching product:", error);
     if (error.kind === "ObjectId") {
@@ -77,9 +67,7 @@ const getSingleProductByName = async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
-    return res
-      .status(200)
-      .json({ message: "Product fetched successfully", data: product });
+    return res.status(200).json(product);
   } catch (error) {
     console.error("Error fetching product:", error);
     if (error.kind === "ObjectId") {
@@ -98,10 +86,7 @@ const getMyProducts = async (req, res) => {
         .status(404)
         .json({ message: "No products found for this seller" });
     }
-    return res.status(200).json({
-      message: "Seller's products fetched successfully",
-      data: products,
-    });
+    return res.status(200).json({ products });
   } catch (error) {
     console.error("Error fetching seller products:", error);
     return res.status(500).json({
@@ -149,9 +134,7 @@ const addNewProduct = async (req, res) => {
     });
 
     await newProduct.save();
-    return res
-      .status(201)
-      .json({ message: "Product added successfully", data: newProduct });
+    return res.status(201).json(newProduct);
   } catch (error) {
     console.error("Error adding new product:", error);
     return res.status(500).json({ message: "Error adding new product" });
@@ -180,9 +163,7 @@ const editProduct = async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    return res
-      .status(200)
-      .json({ message: "Product updated successfully", data: updatedProduct });
+    return res.status(200).json(updatedProduct);
   } catch (error) {
     console.error("Error editing product:", error);
     return res.status(500).json({ message: "Error editing product" });
@@ -193,11 +174,16 @@ const editProduct = async (req, res) => {
 const deleteProduct = async (req, res) => {
   try {
     const { productId } = req.params;
-    const deletedProduct = await Product.findByIdAndDelete(productId);
+    const deletedProduct = await Product.findByIdAndUpdate(
+      productId, // The ID of the product you want to "delete"
+      { isDeleted: true }, // Update the isDeleted field to true
+      { new: true } // Return the updated document
+    );
+
     if (!deletedProduct) {
       return res.status(404).json({ message: "Product not found" });
     }
-    return res.status(200).json({ message: "Product deleted successfully" });
+    return res.status(200).json(deletedProduct);
   } catch (error) {
     console.error("Error deleting product:", error);
     return res.status(500).json({ message: "Error deleting product" });

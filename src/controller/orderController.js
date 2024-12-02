@@ -21,9 +21,7 @@ const getOrders = async (req, res) => {
       order.products.map((p) => p.product)
     );
 
-    res
-      .status(200)
-      .json({ message: "successfully getting orders", data: products });
+    res.status(200).json(products);
   } catch (error) {
     console.error("Error fetching orders:", error);
     res.status(500).json({ message: "Error fetching orders" });
@@ -33,6 +31,7 @@ const getOrders = async (req, res) => {
 const addOrder = async (req, res) => {
   try {
     const userId = req.params.userId; // Clerk user ID
+    console.log(userId, "user id di add order");
 
     // Find the user's cart
     const cart = await Cart.findOne({ userId }).populate({
@@ -104,9 +103,7 @@ const addOrder = async (req, res) => {
     // Clear the user's cart after successful checkout
     await Cart.deleteOne({ userId });
 
-    res
-      .status(201)
-      .json({ message: "Order placed successfully", data: newOrder });
+    res.status(201).json(newOrder);
   } catch (error) {
     console.error("Error placing order:", error);
     res.status(500).json({ message: "Error placing order" });
