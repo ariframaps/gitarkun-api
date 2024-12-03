@@ -12,7 +12,7 @@ const getTransactionToken = async (req, res) => {
     let snap = new midtransClient.Snap({
       // Set to true if you want Production Environment (accept real transaction).
       isProduction: false,
-      serverKey: "SB-Mid-server-Quo1vMJhO93T6eWf-TWwRSv8",
+      serverKey: process.env.SERRVER_MIDTRANS_KEY,
     });
 
     let parameter = {
