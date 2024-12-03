@@ -3,9 +3,9 @@ const mongoose = require("mongoose");
 
 // Controller to get a user's cart
 const getCart = async (req, res) => {
+  console.log("getCart called");
   try {
     const { userId } = req.params; // Extract userId from request parameters
-    console.log(userId);
     const cart = await Cart.findOne({ userId });
 
     if (!cart) {
@@ -21,28 +21,25 @@ const getCart = async (req, res) => {
 };
 
 const addCart = async (req, res) => {
+  console.log("add cart called");
   try {
     const { userId, product } = req.body; // product: productId, image, price, name
-    console.log(userId, product);
 
     if (!userId || !product) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
     let cart = await Cart.findOne({ userId });
-    console.log(cart);
 
     // If no cart, create a new cart
     if (!cart) {
       cart = new Cart({ userId, products: [] });
-      console.log(cart);
     }
 
     // Check if the product already exists in the cart
     const productIndex = cart.products.findIndex(
       (item) => item.product.toString() === product.productId
     );
-    console.log(productIndex);
 
     if (productIndex === -1) {
       // Product not in cart, add new product
@@ -51,11 +48,10 @@ const addCart = async (req, res) => {
         ...product,
         product: new mongoose.Types.ObjectId(product.productId),
       });
-      console.log(cart);
       cart.total += product.price;
     }
 
-    await cart.save().then((res) => console.log(res));
+    await cart.save();
 
     // Respond with the updated cart
     return res.status(201).json(cart);
@@ -66,9 +62,9 @@ const addCart = async (req, res) => {
 };
 
 const deleteCartItem = async (req, res) => {
+  console.log("delet cart item called");
   try {
     const { userId, productId, price } = req.query;
-    console.log(userId, productId, price, "ini delete bos");
 
     const cart = await Cart.findOne({ userId });
     if (!cart) {
@@ -78,7 +74,6 @@ const deleteCartItem = async (req, res) => {
     const itemIndex = cart.products.findIndex(
       (item) => item.product.toString() === productId
     );
-    console.log(itemIndex);
     if (itemIndex === -1) {
       return res.status(404).json({ message: "Product not found in cart" });
     }
@@ -100,7 +95,7 @@ const deleteCartItem = async (req, res) => {
     // reducing total amount
     cart.total -= Number(price);
 
-    await cart.save().then((res) => console.log(res));
+    await cart.save();
 
     return res
       .status(200)

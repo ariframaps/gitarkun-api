@@ -3,6 +3,7 @@ const { Analytics } = require("../model/analyticsModel");
 // Controller to get analytics data for a seller
 const getAnalytics = async (req, res) => {
   try {
+    console.log("getAnalytics called");
     const { sellerId } = req.params; // Extract sellerId from request parameters
     const analytics = await Analytics.findOne({ sellerId }).populate(
       "productStats.product"
@@ -12,7 +13,6 @@ const getAnalytics = async (req, res) => {
       return res.status(404).json({ message: "Analytics data not found" });
     }
 
-    console.log(analytics, "analytiich");
     // Respond with the found analytics data
     return res.status(200).json(analytics);
   } catch (error) {

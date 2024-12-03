@@ -81,7 +81,6 @@ const getSingleProductByName = async (req, res) => {
 const getMyProducts = async (req, res) => {
   try {
     const products = await Product.find({ sellerId: req.params.sellerId });
-    console.log(req.params.sellerId, "getMyProducts");
     if (!products || products.length === 0) {
       return res
         .status(404)
