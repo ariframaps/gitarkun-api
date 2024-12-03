@@ -5,6 +5,7 @@ const { Analytics } = require("../model/analyticsModel");
 
 // Controller to get the products a user has purchased
 const getOrders = async (req, res) => {
+  console.log("get orders called");
   try {
     const userId = req.params.userId; // Clerk user ID from authentication
     const orders = await Order.find({ buyerId: userId }).populate(
@@ -29,9 +30,9 @@ const getOrders = async (req, res) => {
 };
 
 const addOrder = async (req, res) => {
+  console.log("add order called");
   try {
     const userId = req.params.userId; // Clerk user ID
-    console.log(userId, "user id di add order");
 
     // Find the user's cart
     const cart = await Cart.findOne({ userId }).populate({

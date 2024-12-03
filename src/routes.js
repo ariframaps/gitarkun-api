@@ -16,6 +16,9 @@ const {
   deleteCartItem,
 } = require("./controller/cartController");
 const { getAnalytics } = require("./controller/analyticsController");
+const {
+  getTransactionToken,
+} = require("./controller/paymentGatewayController");
 const router = express.Router();
 
 // ping
@@ -46,5 +49,8 @@ router.delete("/cart", deleteCartItem);
 
 // private analytics
 router.get("/analytics/:sellerId", getAnalytics);
+
+// get transaction token
+router.post("/get-transaction-token", getTransactionToken);
 
 module.exports = router;
