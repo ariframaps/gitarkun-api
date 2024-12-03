@@ -41,6 +41,8 @@ const cartSchema = new mongoose.Schema({
   },
 });
 
+cartSchema.index({ userId: 1, "products.name": 1 }, { unique: true });
+
 // Error Handling for Mongoose operations
 cartSchema.post("save", function (error, doc, next) {
   if (error.name === "ValidationError") {

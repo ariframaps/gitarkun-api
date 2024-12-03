@@ -35,10 +35,6 @@ const orderSchema = new mongoose.Schema({
               message: "Invalid URL format for product link",
             },
           },
-          isDeleted: {
-            type: Boolean,
-            default: false,
-          },
         }),
         required: [true, "Product is required"],
       },

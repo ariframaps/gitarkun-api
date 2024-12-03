@@ -45,6 +45,6 @@ router.post("/cart", addCart);
 router.delete("/cart", deleteCartItem);
 
 // private analytics
-router.get("/analytics/:sellerId", getAnalytics);
+router.get("/analytics/:sel lerId", getAnalytics);
 
 module.exports = router;

@@ -6,7 +6,7 @@ const getCart = async (req, res) => {
   try {
     const { userId } = req.params; // Extract userId from request parameters
     console.log(userId);
-    const cart = await Cart.findOne({ userId }).populate("products.product");
+    const cart = await Cart.findOne({ userId });
 
     if (!cart) {
       return res.status(404).json({ message: "Cart not found" });
@@ -46,6 +46,7 @@ const addCart = async (req, res) => {
 
     if (productIndex === -1) {
       // Product not in cart, add new product
+      delete product._id;
       cart.products.push({
         ...product,
         product: new mongoose.Types.ObjectId(product.productId),
@@ -96,11 +97,10 @@ const deleteCartItem = async (req, res) => {
 
     // Remove the item from the cart
     cart.products.splice(itemIndex, 1);
-    console.log(miaw);
     // reducing total amount
     cart.total -= Number(price);
 
-    await cart.save();
+    await cart.save().then((res) => console.log(res));
 
     return res
       .status(200)
