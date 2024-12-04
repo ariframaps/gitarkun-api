@@ -9,35 +9,9 @@ const orderSchema = new mongoose.Schema({
   },
   products: [
     {
-      product: {
-        type: new mongoose.Schema({
-          name: {
-            type: String,
-            required: [true, "Product name is required"],
-            trim: true,
-          },
-          image: {
-            type: String,
-            required: [true, "Product image is required"],
-          },
-          category: {
-            type: String,
-            required: [true, "Product category is required"],
-            trim: true,
-          },
-          link: {
-            type: String,
-            required: [true, "Product link (PDF) is required"],
-            validate: {
-              validator: function (v) {
-                return /^(ftp|http|https):\/\/[^ "]+$/.test(v); // Validate URL format
-              },
-              message: "Invalid URL format for product link",
-            },
-          },
-        }),
-        required: [true, "Product is required"],
-      },
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Product",
+      required: [true, "Product is required"],
     },
   ],
   totalAmount: {

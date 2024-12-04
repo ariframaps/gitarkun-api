@@ -43,10 +43,10 @@ const addCart = async (req, res) => {
 
     if (productIndex === -1) {
       // Product not in cart, add new product
-      delete product._id;
+      // delete product._id;
       cart.products.push({
         ...product,
-        product: new mongoose.Types.ObjectId(product.productId),
+        // product: new mongoose.Types.ObjectId(product.productId),
       });
       cart.total += product.price;
     }

@@ -8,9 +8,7 @@ const getOrders = async (req, res) => {
   console.log("get orders called");
   try {
     const userId = req.params.userId; // Clerk user ID from authentication
-    const orders = await Order.find({ buyerId: userId }).populate(
-      "products.product"
-    );
+    const orders = await Order.find({ buyerId: userId }).populate("products");
 
     // If no orders are found for the user
     if (!orders || orders.length === 0) {
@@ -18,9 +16,7 @@ const getOrders = async (req, res) => {
     }
 
     // Get all product IDs from the orders
-    const products = orders.flatMap((order) =>
-      order.products.map((p) => p.product)
-    );
+    const products = orders.flatMap((order) => order.products);
 
     res.status(200).json(products);
   } catch (error) {
@@ -35,10 +31,7 @@ const addOrder = async (req, res) => {
     const userId = req.params.userId; // Clerk user ID
 
     // Find the user's cart
-    const cart = await Cart.findOne({ userId }).populate({
-      path: "products.product",
-      select: "name image category link isDeleted",
-    });
+    const cart = await Cart.findOne({ userId }).lean();
 
     if (!cart) {
       return res.status(404).json({
@@ -46,10 +39,14 @@ const addOrder = async (req, res) => {
       });
     }
 
+    // Transform hasil untuk hanya mengambil productId sebagai array
+    const productIds = cart.products.map((p) => p.product);
+
+    console.log(cart, productIds, "ini cart di add order");
     // Copy cart contents to orders
     const newOrder = new Order({
       buyerId: cart.userId,
-      products: cart.products,
+      products: productIds,
       totalAmount: cart.total,
     });
     await newOrder.save();
