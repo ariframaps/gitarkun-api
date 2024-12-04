@@ -21,7 +21,7 @@ const getTransactionToken = async (req, res) => {
         gross_amount: gross_amount,
       },
       callbacks: {
-        finish: "https://gitarkun.vercel.app/",
+        finish: "https://gitarkun.vercel.app/checkout-redirect",
       },
       item_details: cart_items,
       credit_card: {
