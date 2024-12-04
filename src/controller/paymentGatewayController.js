@@ -20,6 +20,9 @@ const getTransactionToken = async (req, res) => {
         order_id: Math.random() * 100000,
         gross_amount: gross_amount,
       },
+      callbacks: {
+        finish: "https://gitarkun.vercel.app/",
+      },
       item_details: cart_items,
       credit_card: {
         secure: true,
